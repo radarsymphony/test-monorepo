@@ -1,0 +1,7 @@
+services:
+  python:
+    build:
+      context: ../ # Development only
+      dockerfile: ./python/Dockerfile
+    image: python:dev
+

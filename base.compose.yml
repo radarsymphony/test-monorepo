@@ -1,0 +1,9 @@
+services:
+
+  build-base-image:
+    image: docker-base:${BASE_VERSION:-dev}
+    build:
+      args:
+        - ALPINE_VERSION=3.18
+      context: . # context relative to each subfolder
+      dockerfile: base.Dockerfile # context relevant to each subfolder
