@@ -3,7 +3,7 @@ run-name: ${{ github.actor }} is building the shell image
 on:
   push: 
     paths:
-      - 'shell'
+      - 'shell/**'
 jobs:
   Build-Shell-Image:
     runs-on: ubuntu-latest
