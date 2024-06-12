@@ -1,7 +1,8 @@
 services:
   python:
     build:
+      args:
+        - ALPINE_VERSION=3.18
       context: ../ # Development only
-      dockerfile: ./python/Dockerfile
+      target: python
     image: python:dev
-

@@ -1,3 +1,3 @@
-#!/bin/python3
+#!/usr/bin/python3
 
 print("Hello from python/app2/script.py")
