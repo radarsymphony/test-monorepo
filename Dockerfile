@@ -19,7 +19,8 @@ CMD [ "echo -e '\nAvailable Scripts:\n'; ls -l /scripts/*" ]
 # Shell Image
 FROM base AS shell
 COPY ./shell/ /src
-RUN mv /src/* ./; for dir in *; do chmod +x "${dir}"/*.sh; done
+#RUN mv /src/* ./; for dir in *; do chmod +x "${dir}"/*.sh; done
+RUN find /scripts -name "*.sh" -exec chmod +x {} \;
 
 # Python Image
 FROM base AS python
