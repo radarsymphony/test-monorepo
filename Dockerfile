@@ -9,22 +9,23 @@ RUN apk update && \
         #rsync \
         #openssh-client-default
 
-RUN mkdir /scripts
-WORKDIR /scripts
+# Define working directory
+ENV WDIR=/scripts
+RUN mkdir ${WDIR}
+WORKDIR ${WDIR}
 
-# Set Entrypoint for image
+# Set default entrypoint for images
 ENTRYPOINT [ "/bin/sh", "-c" ]
-CMD [ "echo -e '\nAvailable Scripts:\n'; ls -l /scripts/*" ]
+CMD [ "echo -e '\nAvailable Scripts:\n'; ls -l ${WDIR}/*" ]
 
-# Shell Image
+# Build the Shell Image variant
 FROM base AS shell
-COPY ./shell/ /src
-#RUN mv /src/* ./; for dir in *; do chmod +x "${dir}"/*.sh; done
-RUN find /scripts -name "*.sh" -exec chmod +x {} \;
+COPY ./shell .
+RUN find ${WDIR} -name "*.sh" -exec chmod +x {} \;
 
-# Python Image
+# Build the Python Image variant
 FROM base AS python
 RUN apk add python3
-COPY ./python/ .
-RUN mv /src/* ./; for dir in *; do chmod +x "${dir}"/*.py; done
+COPY ./python .
+RUN find ${WDIR} -name "*.py" -exec chmod +x {} \;
 
