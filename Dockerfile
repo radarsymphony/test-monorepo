@@ -18,11 +18,12 @@ CMD [ "echo -e '\nAvailable Scripts:\n'; ls -l /scripts/*" ]
 
 # Shell Image
 FROM base AS shell
-COPY ./shell/ .
-RUN for dir in ./*; do chmod +x "${dir}"/*.sh; done
+COPY ./shell/ /src
+RUN mv /src/* ./; for dir in *; do chmod +x "${dir}"/*.sh; done
 
 # Python Image
 FROM base AS python
 RUN apk add python3
 COPY ./python/ .
-RUN for dir in ./*; do chmod +x "${dir}"/*.py; done
+RUN mv /src/* ./; for dir in *; do chmod +x "${dir}"/*.py; done
+
