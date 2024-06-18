@@ -21,6 +21,5 @@ jobs:
         uses: docker/setup-buildx-action@v3
         # Replace with Build & Push to registry action 
       - run: docker build --target shell -t knightsdata/test-monorepo:shell .
-      - run: docker run --rm monorepo:shell ./app1/script.sh
-      # Add run action like: curl --request GET  --url 'https://coolify.example.com/v1/deploy?tag=shell-script'  --header 'Authorization: Bearer demo-bearer-token'
+      - run: docker run --rm knightsdata/test-monorepo:shell ./app1/script.sh
       - run: echo "🍏 This job's status is ${{ job.status }}."
