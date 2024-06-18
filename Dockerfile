@@ -9,12 +9,12 @@ RUN apk update && \
         #rsync \
         #openssh-client-default
 
-RUN mkdir /src
-WORKDIR /src
+RUN mkdir /scripts
+WORKDIR /scripts
 
 # Set Entrypoint for image
 ENTRYPOINT [ "/bin/sh", "-c" ]
-CMD [ "ls -al /src/*" ]
+CMD [ "echo -e '\nAvailable Scripts:\n'; ls -l /scripts/*" ]
 
 # Shell Image
 FROM base AS shell
