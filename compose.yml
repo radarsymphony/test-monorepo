@@ -1,7 +1,7 @@
 services:
 
   build-base-image:
-    image: base:${BASE_VERSION:-dev}
+    image: monorepo:${BASE_VERSION:-base}
     build:
       args:
         - ALPINE_VERSION=3.18

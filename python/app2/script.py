@@ -1,3 +1,5 @@
 #!/usr/bin/python3
 
-print("Hello from python/app2/script.py")
+from os import getcwd
+
+print("Hello from", getcwd(), "- app2")

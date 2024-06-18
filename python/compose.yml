@@ -5,4 +5,4 @@ services:
         - ALPINE_VERSION=3.18
       context: ../ # Development only
       target: python
-    image: python:dev
+    image: knightsdata/test-monorepo:python

@@ -2,5 +2,4 @@
 
 set -euo pipefail
 
-echo "Hello from shell/app1/script.sh"
-echo "Another line..."
+echo "Hello from ${0} - app1"

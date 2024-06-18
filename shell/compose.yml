@@ -5,4 +5,4 @@ services:
         - ALPINE_VERSION=3.18
       context: ../
       target: shell
-    image: shell:dev
+    image: knightsdata/monorepo:shell
