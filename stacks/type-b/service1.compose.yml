@@ -1,0 +1,10 @@
+services:
+  python-app1:
+    image: knightsdata/test-monorepo:python
+    command: app1/script.py
+    networks:
+      - services
+
+networks:
+  services:
+    external: true

@@ -1,0 +1,10 @@
+services:
+  shell-app1:
+    image: knightsdata/test-monorepo:shell
+    command: app1/script.sh
+    networks:
+      - services
+
+networks:
+  services:
+    external: true
