@@ -2,6 +2,8 @@ services:
   shell-app1:
     image: knightsdata/test-monorepo:shell
     command: app1/script.sh
+    environment:
+      - ENVIRONMENT_VARIABLE=${TEST_ENV_VAR}
     networks:
       - services
 
