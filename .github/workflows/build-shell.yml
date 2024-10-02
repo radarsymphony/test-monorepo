@@ -1,13 +1,35 @@
 name: Build Shell Image
 run-name: ${{ github.actor }} is building the shell image
 on:
-  push: 
+  push:
+    branches:
+      - develop
     paths:
-      - 'shell/**'
+      - 'src/shell/**'
+      - 'src/startup.sh'
+      - 'src/Dockerfile'
+    tags:
+      - 'v*+shell'
+
 jobs:
   build-image:
     runs-on: ubuntu-latest
     steps:
+      - 
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            hakaiinstitute/it-scripts-shell
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -27,9 +49,10 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: true
-          context: .
+          context: src
           target: shell
-          tags: knightsdata/test-monorepo:shell
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       - run: echo "🍏 This job's status is ${{ job.status }}."
