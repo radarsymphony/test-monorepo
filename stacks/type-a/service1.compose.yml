@@ -4,6 +4,8 @@ services:
     command: app1/script.sh
     environment:
       - ENVIRONMENT_VARIABLE=${TEST_ENV_VAR}
+    volumes:
+      - ${VARIABLE_LOCATION}:/data
     networks:
       - services
 
