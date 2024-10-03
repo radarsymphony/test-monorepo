@@ -7,9 +7,8 @@ on:
     branches:
       - main
     paths:
-      - 'src/shell/**'
-      - 'src/startup.sh'
-      - 'src/Dockerfile'
+      - 'shell/**'
+      - 'Dockerfile'
 
 jobs:
   if_merged:
