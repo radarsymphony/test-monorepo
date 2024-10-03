@@ -1,0 +1,21 @@
+name: Shell changes merged to main
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - 'src/shell/**'
+      - 'src/startup.sh'
+      - 'src/Dockerfile'
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - run: |
+        echo The PR was merged to main that updates src/shell
+
