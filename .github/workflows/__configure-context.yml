@@ -21,7 +21,10 @@ jobs:
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=sha
- 
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+
   configure-development:
     if: github.ref_name == 'develop'
     runs-on: ubuntu-latest
@@ -34,11 +37,14 @@ jobs:
             it-scripts-${{ inputs.src_type }}
           tags: |
             type=ref,event=branch
-  
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+ 
   start-build:
      uses: ./.github/workflows/__build-image.yml
      with:
        src_type: ${{ inputs.src_type }}
        env_type: development
-       meta_tags: ${{ jobs.configure-development.outputs.tags }}
-       meta_labels: ${{ jobs.configure-development.outputs.labels }}
+       meta_tags: ${{ needs.jobs.configure-development.outputs.tags }}
+       meta_labels: ${{ needs.jobs.configure-development.outputs.labels }}
