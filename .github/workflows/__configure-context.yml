@@ -1,0 +1,53 @@
+name: Configure Build Context
+
+on:
+  workflow_call:
+    inputs:
+      src_type:
+        required: true
+        type: string
+      
+jobs: 
+  configure-production:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            hakaiinstitute/it-scripts-${{ github.event.inputs.src_type }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=sha
+
+      - name: Build production image
+        uses: ./.github/workflows/__build-image.yml
+        with:
+          src_type: ${{ github.event.inputs.src_type }}
+          env_type: "production"
+          meta_tags: ${{ steps.meta.outputs.tags }}
+          meta_labels: ${{ steps.meta.outputs.labels }}
+
+  configure-development:
+    if: github.ref_name == 'develop'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            hakaiinstitute/it-scripts-${{ github.event.inputs.src_type }}
+          tags: |
+            type=ref,event=branch
+
+      - name: Build production image
+        uses: ./.github/workflows/__build-image.yml
+        with:
+          src_type: ${{ github.event.inputs.src_type }}
+          env_type: "development"
+          meta_tags: ${{ steps.meta.outputs.tags }}
+          meta_labels: ${{ steps.meta.outputs.labels }}
+
