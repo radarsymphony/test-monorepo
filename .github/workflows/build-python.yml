@@ -3,11 +3,21 @@ name: Build Python Image
 run-name: ${{ github.actor }} is building the python image
 
 on:
-  push: 
+  push:
+    branches:
+      - develop
     paths:
       - 'python/**'
       - Dockerfile
-    
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+    paths:
+      - 'python/**'
+      - Dockerfile
+
 env: 
   SRC_TYPE: python
 
