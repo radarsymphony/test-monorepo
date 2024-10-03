@@ -18,11 +18,8 @@ on:
       - 'python/**'
       - Dockerfile
 
-env: 
-  SRC_TYPE: python
-
 jobs:
   determine-build-context:
     uses: ./.github/workflows/__configure-context.yml
     with:
-      src_type: ${{ env.SRC_TYPE }}
+      src_type: python
