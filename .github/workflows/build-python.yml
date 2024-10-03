@@ -23,13 +23,6 @@ env:
 
 jobs:
   determine-build-context:
-    runs-on: ubuntu-latest
-    steps:
-      - 
-        name: Check out the repo
-        uses: actions/checkout@v4      
-      - 
-        name: Build Context
-        uses: ./.github/workflows/__configure-context.yml
-        with: 
-          src_type: ${{ env.SRC_TYPE }}
+    uses: ./.github/workflows/__configure-context.yml
+    with:
+      src_type: ${{ env.SRC_TYPE }}
