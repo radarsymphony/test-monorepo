@@ -22,11 +22,10 @@ env:
   SRC_TYPE: python
 
 jobs:
-  detect-build-context:
+  determine-build-context:
     runs-on: ubuntu-latest
     steps:
-      - name: Build Environment 
+      - name: Build Context
         uses: ./.github/workflows/__configure-context.yml
         with: 
           src_type: ${{ env.SRC_TYPE }}
-
