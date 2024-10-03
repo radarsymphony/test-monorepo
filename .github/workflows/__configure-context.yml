@@ -34,14 +34,11 @@ jobs:
             it-scripts-${{ inputs.src_type }}
           tags: |
             type=ref,event=branch
-      - name: Set environment
-        id: set_env
-        run: echo "::set-output name=env_type::development"
   
   start-build:
      uses: ./.github/workflows/__build-image.yml
      with:
        src_type: ${{ inputs.src_type }}
-       env_type: ${{ needs.set_env.outputs.env_type }}
-       meta_tags: ${{ steps.meta.outputs.tags }}
-       meta_labels: ${{ steps.meta.outputs.labels }}
+       env_type: development
+       meta_tags: ${{ jobs.configure-development.outputs.tags }}
+       meta_labels: ${{ jobs.configure-development.outputs.labels }}
