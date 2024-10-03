@@ -9,7 +9,7 @@ on:
       - 'src/startup.sh'
       - 'src/Dockerfile'
     tags:
-      - 'v*+shell'
+      - 'v*'
 
 jobs:
   build-image:
@@ -29,6 +29,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            type=sha
 
       -
         name: Set up QEMU
