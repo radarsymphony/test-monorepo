@@ -7,13 +7,13 @@ on:
     paths:
       - 'python/**'
       - Dockerfile
-
+    
 env: 
   SRC_TYPE: python
 
 jobs:
   build-production:
-    if: github.ref_name == 'main' && github.event.pull_request.merged == true
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
     runs-on: ubuntu-latest
     steps:
       - run: echo "Building ${SRC_TYPE} production image on merge to main"
