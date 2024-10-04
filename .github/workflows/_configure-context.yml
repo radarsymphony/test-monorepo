@@ -31,9 +31,6 @@ jobs:
             it-scripts-${{ inputs.src_type }}
           tags: |
             type=ref,event=branch
-
-      - run: echo "Environment Configured"
-      - run: echo "${{ steps.dev_meta.outputs.tags }}"
     outputs:
       prd_tags: ${{ steps.prd_meta.outputs.tags }}
       prd_labels: ${{ steps.prd_meta.outputs.labels }}
@@ -48,6 +45,7 @@ jobs:
       meta_tags: ${{ steps.detected_vars.outputs.meta_tags }}
       meta_labels: ${{ steps.detected_vars.outputs.meta_labels }}
     steps:
+      - run: echo ${{ needs.jobs.configure-environment.outputs.dev_tags }}
       - name: Use development unless production detected
         id: detected_vars
         run: |
@@ -56,7 +54,7 @@ jobs:
             echo "::set-output name=env_type::production"
             echo "::set-output name=meta_tags::${{ needs.jobs.configure-environment.outputs.prd_tags }}"
             echo "::set-output name=meta_labels::${{ needs.jobs.configure-environment.outputs.prd_labels }}"
-          elif [ -n "${{ needs.jobs.configure-environment.outputs.dev_tags }}" ]; then
+          elif [ -n ${{ needs.jobs.configure-environment.outputs.dev_tags }} ]; then
             echo "Setting Development Variables"
             echo "::set-output name=env_type::development"
             echo "::set-output name=meta_tags::${{ needs.jobs.configure-environment.outputs.dev_tags }}"
