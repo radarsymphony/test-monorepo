@@ -10,10 +10,16 @@ on:
 jobs: 
   configure-environment:
     runs-on: ubuntu-latest
+    outputs:
+      prd_tags: ${{ steps.prd_meta.outputs.tags }}
+      prd_labels: ${{ steps.prd_meta.outputs.labels }}
+      dev_tags: ${{ steps.dev_meta.outputs.tags }}
+      dev_labels: ${{ steps.dev_meta.outputs.labels }}
+      new_out: "development"
     steps:
       - name: Production Docker meta
-        if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
         id: prd_meta
+        if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
         uses: docker/metadata-action@v5
         with:
           images: |
@@ -23,20 +29,14 @@ jobs:
             type=sha
 
       - name: Development Docker meta
-        if: github.ref_name == 'develop'
         id: dev_meta
+        if: github.ref_name == 'develop'
         uses: docker/metadata-action@v5
         with:
           images: |
             it-scripts-${{ inputs.src_type }}
           tags: |
             type=ref,event=branch
-    outputs:
-      prd_tags: ${{ steps.prd_meta.outputs.tags }}
-      prd_labels: ${{ steps.prd_meta.outputs.labels }}
-      dev_tags: ${{ steps.dev_meta.outputs.tags }}
-      dev_labels: ${{ steps.dev_meta.outputs.labels }}
-      new_out: "development"
 
   set-variables:
     runs-on: ubuntu-latest
@@ -55,7 +55,8 @@ jobs:
             echo "env_type=production" >> $GITHUB_OUTPUT
             echo "meta_tags=${{ needs.jobs.configure-environment.outputs.prd_tags }}" >> $GITHUB_OUTPUT
             echo "meta_labels=${{ needs.jobs.configure-environment.outputs.prd_labels }}" >> $GITHUB_OUTPUT
-          elif [ -n ${{ needs.jobs.configure-environment.outputs.new_out }} ]; then
+            #elif [ -n ${{ needs.jobs.configure-environment.outputs.dev_tags }} ]; then
+          elif [ -n "dev" ]; then
             echo "Setting Development Variables"
             echo "env_type=development" >> $GITHUB_OUTPUT
             echo "meta_tags=${{ needs.jobs.configure-environment.outputs.dev_tags }}" >> $GITHUB_OUTPUT
