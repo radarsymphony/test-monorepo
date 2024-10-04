@@ -11,11 +11,9 @@ jobs:
   configure-environment:
     runs-on: ubuntu-latest
     outputs:
-      prd_tags: ${{ steps.prd_meta.outputs.tags }}
-      prd_labels: ${{ steps.prd_meta.outputs.labels }}
-      dev_tags: ${{ steps.dev_meta.outputs.tags }}
-      dev_labels: ${{ steps.dev_meta.outputs.labels }}
-      new_out: "development"
+      env_type: ${{ steps.detect_vars.outputs.env_type }}
+      meta_tags: ${{ steps.detect_vars.outputs.meta_tags }}
+      meta_labels: ${{ steps.detect_vars.outputs.meta_labels }}
     steps:
       - name: Production Docker meta
         id: prd_meta
@@ -38,29 +36,20 @@ jobs:
           tags: |
             type=ref,event=branch
 
-  set-variables:
-    runs-on: ubuntu-latest
-    needs: [ configure-environment ]
-    outputs:
-      env_type: ${{ steps.detected_vars.outputs.env_type }} 
-      meta_tags: ${{ steps.detected_vars.outputs.meta_tags }}
-      meta_labels: ${{ steps.detected_vars.outputs.meta_labels }}
-    steps:
-      - run: echo ${{ needs.jobs.configure-environment.outputs.new_out }}
+      - run: echo "${{ steps.dev_meta.outputs.tags }}"
       - name: Use development unless production detected
         id: detected_vars
         run: |
-          if [ -n "${{ needs.jobs.configure-environment.outputs.prd_tags }}" ]; then
+          if [ -n "${{ steps.prd_meta.outputs.tags }}" ]; then
             echo "Setting Production Variables"
             echo "env_type=production" >> $GITHUB_OUTPUT
-            echo "meta_tags=${{ needs.jobs.configure-environment.outputs.prd_tags }}" >> $GITHUB_OUTPUT
-            echo "meta_labels=${{ needs.jobs.configure-environment.outputs.prd_labels }}" >> $GITHUB_OUTPUT
-            #elif [ -n ${{ needs.jobs.configure-environment.outputs.dev_tags }} ]; then
-          elif [ -n "dev" ]; then
+            echo "meta_tags=${{ steps.prd_meta.outputs.tags }}" >> $GITHUB_OUTPUT
+            echo "meta_labels=${{ steps.prd_meta.outputs.labels }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ steps.dev_meta.outputs.tags }}" ]; then
             echo "Setting Development Variables"
             echo "env_type=development" >> $GITHUB_OUTPUT
-            echo "meta_tags=${{ needs.jobs.configure-environment.outputs.dev_tags }}" >> $GITHUB_OUTPUT
-            echo "meta_labels=${{ needs.jobs.configure-environment.outputs.dev_labels }}" >> $GITHUB_OUTPUT
+            echo "meta_tags=${{ steps.dev_meta.outputs.tags }}" >> $GITHUB_OUTPUT
+            echo "meta_labels=${{ steps.dev_meta.outputs.labels }}" >> $GITHUB_OUTPUT
           else
             echo "No image tags for build environment detected"
             exit 1
@@ -71,6 +60,6 @@ jobs:
     uses: ./.github/workflows/_build-image.yml
     with:
       src_type: ${{ inputs.src_type }}
-      env_type: ${{ needs.jobs.set-variables.outputs.env_type }}
-      meta_tags: ${{ needs.jobs.set-variables.outputs.meta_tags }}
-      meta_labels: ${{ needs.jobs.set-variables.outputs.meta_labels }}
+      env_type: ${{ needs.jobs.configure-environment.outputs.env_type }}
+      meta_tags: ${{ needs.jobs.configure-environment.outputs.meta_tags }}
+      meta_labels: ${{ needs.jobs.configure-environment.outputs.meta_labels }}
