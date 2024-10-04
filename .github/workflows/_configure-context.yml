@@ -56,7 +56,7 @@ jobs:
           fi
 
   start-build:
-    needs: [ set-variables ] 
+    needs: [ configure-environment ] 
     uses: ./.github/workflows/_build-image.yml
     with:
       src_type: ${{ inputs.src_type }}
