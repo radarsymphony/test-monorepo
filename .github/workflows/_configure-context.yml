@@ -41,11 +41,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ configure-environment ]
     outputs:
+      new_out: "development"
       env_type: ${{ steps.detected_vars.outputs.env_type }} 
       meta_tags: ${{ steps.detected_vars.outputs.meta_tags }}
       meta_labels: ${{ steps.detected_vars.outputs.meta_labels }}
     steps:
-      - run: echo ${{ needs.jobs.configure-environment.outputs.dev_tags }}
+      - run: echo ${{ needs.jobs.configure-environment.outputs.new_out }}
       - name: Use development unless production detected
         id: detected_vars
         run: |
@@ -54,7 +55,7 @@ jobs:
             echo "env_type=production" >> $GITHUB_OUTPUT
             echo "meta_tags=${{ needs.jobs.configure-environment.outputs.prd_tags }}" >> $GITHUB_OUTPUT
             echo "meta_labels=${{ needs.jobs.configure-environment.outputs.prd_labels }}" >> $GITHUB_OUTPUT
-          elif [ -n ${{ needs.jobs.configure-environment.outputs.dev_tags }} ]; then
+          elif [ -n ${{ needs.jobs.configure-environment.outputs.new_out }} ]; then
             echo "Setting Development Variables"
             echo "env_type=development" >> $GITHUB_OUTPUT
             echo "meta_tags=${{ needs.jobs.configure-environment.outputs.dev_tags }}" >> $GITHUB_OUTPUT
