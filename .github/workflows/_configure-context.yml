@@ -28,7 +28,7 @@ jobs:
             it-scripts-${{ inputs.src_type }}
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=sha
+            type=ref,event=branch
 
       - name: Development Docker meta
         id: dev_meta
