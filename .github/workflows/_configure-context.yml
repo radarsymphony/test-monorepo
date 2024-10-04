@@ -11,13 +11,17 @@ jobs:
   configure-environment:
     runs-on: ubuntu-latest
     outputs:
-      env_type: ${{ steps.detect_vars.outputs.env_type }}
+      env_type: ${{ steps.detect.outputs.env_type }}
       meta_tags: ${{ steps.detect_vars.outputs.meta_tags }}
       meta_labels: ${{ steps.detect_vars.outputs.meta_labels }}
     steps:
+      - id: context
+        if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+        run: echo "prd_true=true" >> $GITHUB_OUTPUT
+
       - name: Production Docker meta
         id: prd_meta
-        if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+        if: ${{ steps.context.outputs.prd_true }}
         uses: docker/metadata-action@v5
         with:
           images: |
@@ -28,7 +32,7 @@ jobs:
 
       - name: Development Docker meta
         id: dev_meta
-        if: github.ref_name == 'develop'
+        if: ${{ steps.context.outputs.prd_true != 'true' }}
         uses: docker/metadata-action@v5
         with:
           images: |
@@ -36,23 +40,19 @@ jobs:
           tags: |
             type=ref,event=branch
 
-      - run: echo "${{ steps.dev_meta.outputs.tags }}"
       - name: Use development unless production detected
         id: detected_vars
         run: |
-          if [ -n "${{ steps.prd_meta.outputs.tags }}" ]; then
+          if [ -n "${{steps.context.outputs.prd_true}}" ]; then
             echo "Setting Production Variables"
             echo "env_type=production" >> $GITHUB_OUTPUT
             echo "meta_tags=${{ steps.prd_meta.outputs.tags }}" >> $GITHUB_OUTPUT
             echo "meta_labels=${{ steps.prd_meta.outputs.labels }}" >> $GITHUB_OUTPUT
-          elif [ -n "${{ steps.dev_meta.outputs.tags }}" ]; then
+          else
             echo "Setting Development Variables"
             echo "env_type=development" >> $GITHUB_OUTPUT
             echo "meta_tags=${{ steps.dev_meta.outputs.tags }}" >> $GITHUB_OUTPUT
             echo "meta_labels=${{ steps.dev_meta.outputs.labels }}" >> $GITHUB_OUTPUT
-          else
-            echo "No image tags for build environment detected"
-            exit 1
           fi
 
   start-build:
