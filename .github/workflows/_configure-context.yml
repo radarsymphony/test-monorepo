@@ -8,12 +8,16 @@ on:
         type: string
       
 jobs: 
-  configure-production:
-    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+  configure-environment:
     runs-on: ubuntu-latest
+    outputs:
+      env_type: ${{ steps.detect_vars.outputs.env_type }}
+      meta_tags: ${{ steps.detect_vars.outputs.meta_tags }}
+      meta_labels: ${{ steps.detect_vars.outputs.meta_labels }}
     steps:
-      - name: Docker meta
-        id: meta
+      - name: Production Docker meta
+        id: prd_meta
+        if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
         uses: docker/metadata-action@v5
         with:
           images: |
@@ -21,54 +25,41 @@ jobs:
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=sha
-    outputs:
-      tags: ${{ steps.meta.outputs.tags }}
-      labels: ${{ steps.meta.outputs.labels }}
 
-  configure-development:
-    if: github.ref_name == 'develop'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Docker meta
-        id: meta
+      - name: Development Docker meta
+        id: dev_meta
+        if: github.ref_name == 'develop'
         uses: docker/metadata-action@v5
         with:
           images: |
             it-scripts-${{ inputs.src_type }}
           tags: |
             type=ref,event=branch
-    outputs:
-      tags: ${{ steps.meta.outputs.tags }}
-      labels: ${{ steps.meta.outputs.labels }}
 
-  set-variables:
-    runs-on: ubuntu-latest
-    needs: [configure-production, configure-development]
-    outputs:
-      env_type: ${{ needs.steps.detected_vars.outputs.env_type }} 
-      meta_tags: ${{ needs.steps.detected_vars.outputs.meta_tags }}
-      meta_labels: ${{ needs.steps.detected_vars.outputs.meta_labels }}
-    steps:
+      - run: echo "${{ steps.dev_meta.outputs.tags }}"
       - name: Use development unless production detected
         id: detected_vars
         run: |
-          if [ -n "${{ needs.jobs.configure-production.outputs.tags }}" ]; then
-            echo "::set-output name=env_type::production"
-            echo "::set-output name=meta_tags::${{ needs.jobs.configure-production.outputs.tags }}"
-            echo "::set-output name=meta_labels::${{ needs.jobs.configure-production.outputs.labels }}"
-          elif [ -n "${{ needs.jobs.configure-development.outputs.tags }}" ]; then
-            echo "::set-output name=env_type::development"
-            echo "::set-output name=meta_tags::${{ needs.jobs.configure-development.outputs.tags }}"
-            echo "::set-output name=meta_labels::${{ needs.jobs.configure-development.outputs.labels }}"
+          if [ -n "${{ steps.prd_meta.outputs.tags }}" ]; then
+            echo "Setting Production Variables"
+            echo "env_type=production" >> $GITHUB_OUTPUT
+            echo "meta_tags=${{ steps.prd_meta.outputs.tags }}" >> $GITHUB_OUTPUT
+            echo "meta_labels=${{ steps.prd_meta.outputs.labels }}" >> $GITHUB_OUTPUT
+          elif [ -n "${{ steps.dev_meta.outputs.tags }}" ]; then
+            echo "Setting Development Variables"
+            echo "env_type=development" >> $GITHUB_OUTPUT
+            echo "meta_tags=${{ steps.dev_meta.outputs.tags }}" >> $GITHUB_OUTPUT
+            echo "meta_labels=${{ steps.dev_meta.outputs.labels }}" >> $GITHUB_OUTPUT
           else
             echo "No image tags for build environment detected"
             exit 1
           fi
 
   start-build:
-     uses: ./.github/workflows/_build-image.yml
-     with:
-       src_type: ${{ inputs.src_type }}
-       env_type: ${{ needs.jobs.set-variables.outputs.env_type }}
-       meta_tags: ${{ needs.jobs.set-variables.outputs.meta_tags }}
-       meta_labels: ${{ needs.jobs.set-variables.outputs.meta_labels }}
+    needs: [ configure-environment ] 
+    uses: ./.github/workflows/_build-image.yml
+    with:
+      src_type: ${{ inputs.src_type }}
+      env_type: ${{ needs.jobs.configure-environment.outputs.env_type }}
+      meta_tags: ${{ needs.jobs.configure-environment.outputs.meta_tags }}
+      meta_labels: ${{ needs.jobs.configure-environment.outputs.meta_labels }}
