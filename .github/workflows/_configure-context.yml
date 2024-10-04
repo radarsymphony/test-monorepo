@@ -46,13 +46,28 @@ jobs:
           if [ -n "${{steps.context.outputs.prd_true}}" ]; then
             echo "Setting Production Variables"
             echo "env_type=production" >> $GITHUB_OUTPUT
-            echo "meta_tags=${{ steps.prd_meta.outputs.tags }}" >> $GITHUB_OUTPUT
-            echo "meta_labels=${{ steps.prd_meta.outputs.labels }}" >> $GITHUB_OUTPUT
+            {
+              echo "meta_tags<<EOF"
+              ${{ steps.prd_meta.outputs.tags }}
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+            { 
+              echo "meta_labels<<EOF"
+              ${{ steps.prd_meta.outputs.labels }}
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
           else
             echo "Setting Development Variables"
-            echo "env_type=development" >> $GITHUB_OUTPUT
-            echo "meta_tags=${{ steps.dev_meta.outputs.tags }}" >> $GITHUB_OUTPUT
-            echo "meta_labels=${{ steps.dev_meta.outputs.labels }}" >> $GITHUB_OUTPUT
+            {
+              echo "meta_tags<<EOF"
+              ${{ steps.dev_meta.outputs.tags }}
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
+            { 
+              echo "meta_labels<<EOF"
+              ${{ steps.dev_meta.outputs.labels }}
+              echo "EOF"
+            } >> $GITHUB_OUTPUT
           fi
 
   start-build:
