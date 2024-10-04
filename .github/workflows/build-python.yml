@@ -20,6 +20,6 @@ on:
 
 jobs:
   determine-build-context:
-    uses: ./.github/workflows/__configure-context.yml
+    uses: ./.github/workflows/_configure-context.yml
     with:
       src_type: python
