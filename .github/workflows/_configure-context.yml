@@ -51,14 +51,14 @@ jobs:
         run: |
           if [ -n "${{ needs.jobs.configure-environment.outputs.prd_tags }}" ]; then
             echo "Setting Production Variables"
-            echo "::set-output name=env_type::production"
-            echo "::set-output name=meta_tags::${{ needs.jobs.configure-environment.outputs.prd_tags }}"
-            echo "::set-output name=meta_labels::${{ needs.jobs.configure-environment.outputs.prd_labels }}"
+            echo "env_type=production" >> $GITHUB_OUTPUT
+            echo "meta_tags=${{ needs.jobs.configure-environment.outputs.prd_tags }}" >> $GITHUB_OUTPUT
+            echo "meta_labels=${{ needs.jobs.configure-environment.outputs.prd_labels }}" >> $GITHUB_OUTPUT
           elif [ -n ${{ needs.jobs.configure-environment.outputs.dev_tags }} ]; then
             echo "Setting Development Variables"
-            echo "::set-output name=env_type::development"
-            echo "::set-output name=meta_tags::${{ needs.jobs.configure-environment.outputs.dev_tags }}"
-            echo "::set-output name=meta_labels::${{ needs.jobs.configure-environment.outputs.dev_labels }}"
+            echo "env_type=development" >> $GITHUB_OUTPUT
+            echo "meta_tags=${{ needs.jobs.configure-environment.outputs.dev_tags }}" >> $GITHUB_OUTPUT
+            echo "meta_labels=${{ needs.jobs.configure-environment.outputs.dev_labels }}" >> $GITHUB_OUTPUT
           else
             echo "No image tags for build environment detected"
             exit 1
