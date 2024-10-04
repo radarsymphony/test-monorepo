@@ -1,0 +1,24 @@
+name: Workflow 2
+
+on:
+  workflow_call:
+    outputs:
+      add_w2: 
+        value: ${{ jobs.make-value.outputs.pass_w2 }}
+
+jobs:
+  make-value:
+    name: Make value
+    runs-on: ubuntu-latest
+    outputs:
+      pass_w2: ${{ steps.pass.outputs.pass_w1 }}
+    steps:
+      - id: pass
+        run: echo "pass_w1=${{ inputs.from_w1 }} via_two" >> $GITHUB_OUTPUT
+      - run: echo "${{ steps.pass.outputs.pass_w1 }}"
+
+  call-workflow-3:
+    needs: make-value
+    uses: ./.github/workflows/w3.yml
+    with:
+      add_w2: ${{ needs.make-value.outputs.pass_w2 }}

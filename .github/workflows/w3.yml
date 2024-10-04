@@ -1,0 +1,17 @@
+name: Workflow 3
+
+on:
+  workflow_call:
+    inputs:
+      add_w2:
+        required: true
+        type: string
+
+
+jobs:
+  show-values:
+    runs-on: ubuntu-latest
+    steps:
+
+      - run: |
+         echo "value: ${{ inputs.add_w2 }}"
